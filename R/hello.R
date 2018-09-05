@@ -17,7 +17,7 @@ initBatchTools <- function(forceFresh = FALSE) {
     }
 
     userName <- readline("Please specify your username on the cluster:")
-    sshKey <- readline("Path to ssh key:")
+
     nodeName <- readline("Servername in ssh config?")
     print("In which directory would you like to use batchtools?")
     print("The folder will be synchronized to the cluster in the same path relative to your user folder")
@@ -41,9 +41,10 @@ initBatchTools <- function(forceFresh = FALSE) {
     dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
 
     sshInfo <- readSSHInfo(nodeName)
+    sshKey <- sshInfo$identFile
 
-    sess <- ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
-    userDir <- rawToChar(ssh_exec_internal(session = sess, "pwd")$stdout)
+    sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+    userDir <- rawToChar(ssh::ssh_exec_internal(session = sess, "pwd")$stdout)
     userDir <- strsplit(userDir,"/")[[1]][4]
     userDir <- substring(userDir,first = 1, last = nchar(userDir) - 2)
 
@@ -53,7 +54,7 @@ initBatchTools <- function(forceFresh = FALSE) {
 
     synchronizeFolder()
 
-    ssh_exec_wait(paste0("Rscript ", desiredDir,"/packageInstaller.R"))
+    ssh::ssh_exec_wait(paste0("Rscript ", desiredDir,"/packageInstaller.R"))
 }
 
 readSSHInfo <- function(nodeName){
@@ -80,7 +81,12 @@ synchronizeFolder <- function() {
     dir <- idea.config.list$desiredDir
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
-    system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/atm120-6733/"))
+
+    #Problem remaining!!!!!!!
+    #######
+    ##########
+    ##########
+    system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/"))
 }
 
 #' Title
@@ -90,20 +96,21 @@ synchronizeFolder <- function() {
 #'
 #' @import batchtools
 ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
-    dir.create("~/batchExperiments/Experiments", showWarnings = FALSE)
-    dir.create(paste0("~/batchExperiments/Experiments/",mainDir), showWarnings = FALSE)
+    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+    dir.create(paste0(idea.config.list$desiredDir,"/Experiments"), showWarnings = FALSE)
+    dir.create(paste0(idea.config.list$desiredDir,"/Experiments",mainDir), showWarnings = FALSE)
     if(useCluster){
-        conf.file <- "~/batchExperiments/slurm.conf.R"
+        conf.file <- paste0(idea.config.list$desiredDir,"/slurm.conf.R")
     }else{
         stop("no local conf file supplied!")
     }
     additionalParameters <- list(...)
-    additionalParameters$file.dir <- paste0("~/batchExperiments/Experiments/",mainDir,"/",subDir)
+    additionalParameters$file.dir <- paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir)
     additionalParameters$conf.file <- conf.file
     additionalParameters$work.dir <- "~/"
 
     reg <- NULL
-    reg <- try(batchtools::loadRegistry(file.dir = paste0("~/batchExperiments/Experiments/",mainDir,"/",subDir),writeable = T))
+    reg <- try(batchtools::loadRegistry(file.dir = paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir),writeable = T))
     if(is.null(reg) || is.error(reg)){
         do.call(batchtools::makeExperimentRegistry, args = additionalParameters)
     }
