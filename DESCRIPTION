@@ -1,11 +1,27 @@
 Package: ideaBatch
+Version: 0.0.1
+Date: 2018-09-03
+Title: Package 'batchtools' for IDE+A
+Description: Package 'batchtools' for IDE+A
+Author: Frederik Rehbach [aut, cre]
+Authors@R: 
+  c(
+  person("Frederik", "Rehbach", email="frederik.re@gmail.com", role=c("aut", "cre"))
+  )
+Maintainer: Frederik Rehbach <frederik.re@gmail.com>
+LazyData: yes
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: UTF-8
-LazyData: true
+ByteCompile: TRUE
+Depends:
+    R (>= 3.0.1),
+    smoof,
+    batchtools
+Imports: 
+    SPOT,
+    CEGO,
+    ssh
+Suggests: testthat, utils
+License: GPL-3
+VignetteBuilder: utils
+RoxygenNote: 6.0.1
+
