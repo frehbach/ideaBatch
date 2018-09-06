@@ -18,9 +18,8 @@ Depends:
     batchtools
 Imports: 
     SPOT,
-    CEGO,
-    ssh
-Suggests: testthat, utils
+    CEGO
+Suggests: testthat, utils, ssh
 License: GPL-3
 VignetteBuilder: utils
 RoxygenNote: 6.0.1

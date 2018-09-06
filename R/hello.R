@@ -80,6 +80,24 @@ synchronizeFolder <- function() {
     system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/"))
 }
 
+#' Synchronize Experiment Folder
+#'
+#' Synchronizes the Experiment folder to the cluster
+#'
+#' @param dir the dir that is synchronized
+synchronizeJobsFolder <- function(jc){
+    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+    dir <- get("file.dir",jc)
+    dirLocal <- paste0(dir, "/jobs")
+    dirExtern <- substring(dir, 3, nchar(dir))
+
+    #Problem remaining!!!!!!!
+    #######
+    ##########
+    ##########
+    system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+}
+
 #' Title
 #'
 #' @return

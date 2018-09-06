@@ -2,7 +2,7 @@
 log.file = paste0("~/batchExperiments/",log.file)
 cat(log.file, file = "~/batchExperiments/log")
 -%>
-
+#!/bin/bash
 #SBATCH --job-name=<%= job.name %>
 #SBATCH --output=<%= log.file %>
 #SBATCH --error=<%= log.file %>

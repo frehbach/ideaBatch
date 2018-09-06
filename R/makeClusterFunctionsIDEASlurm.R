@@ -5,6 +5,7 @@
 makeClusterFunctionsIDEASlurm <- function (template = "slurm", array.jobs = TRUE, nodename = "localhost",
           scheduler.latency = 1, fs.latency = 65)
 {
+    loadNamespace("batchtools")
     assertFlag(array.jobs)
     assertString(nodename)
     template = findTemplateFile(template)
@@ -12,14 +13,14 @@ makeClusterFunctionsIDEASlurm <- function (template = "slurm", array.jobs = TRUE
         stopf("Argument 'template' (=\"%s\") must point to a readable template file",
               template)
     template = cfReadBrewTemplate(template, "##")
-    quote = if (isLocalHost(nodename))
+    quote = if (batchtools:::isLocalHost(nodename))
         identity
     else shQuote
     getClusters = function(reg) {
         clusters = filterNull(lapply(reg$resources$resources,
                                      "[[", "cluster"))
         if (length(clusters))
-            return(stri_flatten(unique(as.character(clusters)),
+            return(stringi::stri_flatten(unique(as.character(clusters)),
                                 ","))
         return(character(0L))
     }
@@ -29,25 +30,25 @@ makeClusterFunctionsIDEASlurm <- function (template = "slurm", array.jobs = TRUE
         if (jc$array.jobs) {
             logs = sprintf("%s_%i", fs::path_file(jc$log.file),
                            seq_row(jc$jobs))
-            jc$log.file = stri_join(jc$log.file, "_%a")
+            jc$log.file = stringi::stri_join(jc$log.file, "_%a")
         }
         outfile = cfBrewTemplate(reg, template, jc)
 
         ## IDEA Synchronize
-        synchronizeFolder()
+        synchronizeJobsFolder(jc)
         res = runOSCommand("sbatch", outfile, nodename = nodename)
-        output = stri_flatten(stri_trim_both(res$output), "\n")
+        output = stringi::stri_flatten(stringi::stri_trim_both(res$output), "\n")
         if (res$exit.code > 0L) {
             temp.errors = c("Batch job submission failed: Job violates accounting policy (job submit limit, user's size and/or time limits)",
                             "Socket timed out on send/recv operation", "Submission rate too high, suggest using job arrays")
-            i = wf(stri_detect_fixed(output, temp.errors))
+            i = wf(stringi::stri_detect_fixed(output, temp.errors))
             if (length(i) == 1L)
                 return(makeSubmitJobResult(status = i, batch.id = NA_character_,
                                            msg = temp.errors[i]))
             return(cfHandleUnknownSubmitError("sbatch", res$exit.code,
                                               res$output))
         }
-        id = stri_split_fixed(output[1L], " ")[[1L]][4L]
+        id = stringi::stri_split_fixed(output[1L], " ")[[1L]][4L]
         if (jc$array.jobs) {
             if (!array.jobs)
                 stop("Array jobs not supported by cluster function")
@@ -90,6 +91,6 @@ makeClusterFunctionsIDEASlurm <- function (template = "slurm", array.jobs = TRUE
     makeClusterFunctions(name = "Slurm", submitJob = submitJob,
                          killJob = killJob, listJobsRunning = listJobsRunning,
                          listJobsQueued = listJobsQueued, array.var = "SLURM_ARRAY_TASK_ID",
-                         store.job.collection = TRUE, store.job.files = !isLocalHost(nodename),
+                         store.job.collection = TRUE, store.job.files = !batchtools:::isLocalHost(nodename),
                          scheduler.latency = scheduler.latency, fs.latency = fs.latency)
 }
