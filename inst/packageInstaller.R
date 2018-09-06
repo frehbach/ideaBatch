@@ -1,5 +1,4 @@
-if (!require("devtools",character.only = TRUE))
+if (!require("batchtools",character.only = TRUE))
 {
-    install.packages("devtools",dep=TRUE)
+    install.packages("batchtools",dep=TRUE)
 }
-devtools::install_github("frehbach/ideaBatch")

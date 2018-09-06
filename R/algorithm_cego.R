@@ -9,7 +9,7 @@
 #' @import CEGO
 algorithm_CegoByName <- function(strAlgoName,control,...){
     algFun <- function(job, data, instance) {
-        optimAlgo <- getAnywhere(strAlgoName)
+        optimAlgo <- getAnywhere(strAlgoName)[1]
         result <- optimAlgo(fun = instance,control = control,...)
         result$job <- job
         result$clusterAnalysis$iterResults <- result$y

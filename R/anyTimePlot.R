@@ -1,3 +1,7 @@
+#' Title
+#'
+#' @return
+#' @export
 generateResultDF <- function(resultList){
     resultDF <- data.frame(algoName=character(),
                            problemName=character(),
@@ -25,7 +29,10 @@ generateResultDF <- function(resultList){
     resultDF
 }
 
-# algoName ; replication ; iteration ; iterBest
+#' Title
+#'
+#' @return
+#' @export
 anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL, xLim = NULL, ylog = F, xlog = F){
     require(ggplot2)
 
