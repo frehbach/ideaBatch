@@ -1,9 +1,4 @@
-args = commandArgs(trailingOnly=TRUE)
-if(length(args) > 0){
-    path <- args[1]
-}else{
-    path <- "#1#"
-}
+path <- "#1#"
 
 cluster.functions = batchtools::makeClusterFunctionsSlurm(paste0(path,"/slurm.tmpl"),
                                                           nodename = "localhost")

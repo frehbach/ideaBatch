@@ -101,22 +101,19 @@ synchronizeFolder <- function() {
     system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/"))
 }
 
-#' Synchronize Experiment Folder
+#' Load experiment results into result list
 #'
-#' Synchronizes the Experiment folder to the cluster
+#' @param reg The registry from which the results shall be loaded
 #'
-#' @param dir the dir that is synchronized
-synchronizeJobsFolder <- function(jc){
+#' @export
+ideaLoadResultList <- function(reg){
     load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
-    dir <- get("file.dir",jc)
-    dirLocal <- paste0(dir, "/jobs")
+    dir <- get("file.dir",reg)
+    dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
 
-    #Problem remaining!!!!!!!
-    #######
-    ##########
-    ##########
-    system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+    system(paste0("rsync -r -a -v -e ssh --delete owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, " ",dirLocal))
+    reduceResultsList(reg = reg)
 }
 
 #' Title
