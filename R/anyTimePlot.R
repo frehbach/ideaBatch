@@ -33,7 +33,8 @@ generateResultDF <- function(resultList){
 #'
 #' @return
 #' @export
-anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL, xLim = NULL, ylog = F, xlog = F){
+anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL, xLim = NULL, ylog = F
+                                   , xlog = F, useMinMax = F){
     require(ggplot2)
 
     dfNames <- c("algoName", "replication", "iteration", "iterBest")
@@ -50,9 +51,16 @@ anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL,
             sdVal <- sd(subData$iterBest[which(subData$iteration == i)])
             n <- length(subData$iterBest[which(subData$iteration == i)])
 
-            error <- qnorm(1-(1-confidenceInterval)/2)*sdVal/sqrt(n)
-            min <- meanVal - error
-            max <- meanVal + error
+            if(useMinMax){
+                error <- qnorm(1-(1-confidenceInterval)/2)*sdVal/sqrt(n)
+                min <- meanVal - error
+                max <- meanVal + error
+            }else{
+                min <- min(subData$iterBest[which(subData$iteration == i)])
+                max <- max(subData$iterBest[which(subData$iteration == i)])
+            }
+
+
             plotDF <- rbind(plotDF, c(
                 method, i, meanVal,
                 min,
@@ -76,6 +84,6 @@ anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL,
         h <- h + scale_x_log10()
     }
     h <- h + coord_cartesian(ylim = yLim, xlim = xLim)
-    h <- h + scale_colour_manual(name = "Algorithm:",values=c("red","blue","black"))
+    h <- h + scale_colour_manual(name = "Algorithm:",values=c("red","blue","black", "green", "yellow"))
     h
 }

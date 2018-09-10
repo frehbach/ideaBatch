@@ -1,6 +1,5 @@
 ---
-title: "UsageGuide"
-author: "FR"
+title: "Package 'batchtools'"
 date: "07.09.2018"
 output: html_document
 ---
@@ -14,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Let's say you have
 
 * algorithms (a1,a2, ...,an)
-* algorithm settings (s1, ...)
+* settings (s1, ...)
 
 You want to test and compare them on some functions:
 
@@ -24,10 +23,14 @@ The 'batchtools' package can do that in a nicely organised way and fully automat
 
 You want to do it **automatically on a cluster**? Even better.
 
-### Example 1
+### Example
 
 ```{r echo=TRUE, results='hide', message=FALSE}
+## Only for this demo, deletes all Experiments for a fresh strart in the presentation
+unlink("~/someTestDir/Experiments/Seminar/", recursive = TRUE)
+
 require(ideaBatch)
+source(paste0(system.file(package = "ideaBatch"),"/sources.R"))
 
 ## Create an Experiment Registry with a Dir-Name and a Sub-Directory for each test.
 reg <- ideaMakeRegistry("Seminar","Test1") 
@@ -42,9 +45,7 @@ addAlgorithm("optimLHD", algorithm_SpotOptimByName("optimLHD", c(-5,-5),c(5,5),
 addAlgorithm("cmaesCMAES",algorithm_CMAES(c(-5,-5),c(5,5), control = list("maxit" = 100)))
     
 ## Build Experiments
-addExperiments(prob.designs = list("Rosen2D" = data.frame(),
-                                    "Rastr2D" = data.frame()),
-               repls = 1)
+addExperiments(repls = 10)
 ```
 
 ### Show a summary - which Experiments are run?
@@ -55,11 +56,12 @@ summarizeExperiments()
 
 ### Run your experiments
 
-```{R, message=FALSE}
+```{R, message=FALSE, results='hide'}
 # ideaSubmitJobs()
 # ideaSubmitJobs(ids = findNotSubmitted())
 # 
-ideaSubmitJobs(ids= findExperiments())
+#ideaSubmitJobs(ids= findExperiments())
+submitJobs()
 ```
 
 The submitJobs command submits Experiments to the cluster. It is possible to submit all defined Experiments, only specific ones, or filter for a certain group of experiments like: notSubmitted, notFinished, notStarted, aborted etc.
@@ -70,19 +72,47 @@ Experiment results will be nicely kept. As they share the same structure every t
 ```{R}
 results <- reduceResultsList()
 df <- generateResultDF(results)
-problems <- unique(df$problemName)
-for (p in problems) {
-    graph <- anyTimePerformancePlot(df[which(df$problemName == p),],ylog = T)
-    print(graph)
-}
+g <- anyTimePerformancePlot(df[which(df$problemName == "Rastr2D"),],ylog = T, useMinMax = T)
+print(g + ggtitle("Anytime Performance on Rastrigin Function"))
 ```
 
-## Including Plots
+### Redo / Adapt Experiments
+It's also very easy to rerun old experiments or change them:
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{R, message=FALSE, results='hide'}
+submitJobs(id = findJobs()) ## Rerun all experiments, independent of their status
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{R, message=FALSE}
+addAlgorithm("optimDE", algorithm_SpotOptimByName("optimDE", c(-5,-5),c(5,5),
+                                                  control = list(funEvals = 100)))
+
+addExperiments(repls = 20)
+
+summarizeExperiments()
+```
+
+```{R, message=FALSE, results='hide'}
+submitJobs() ## Only runs the experiments which havent already been done
+```
+
+```{R}
+results <- reduceResultsList()
+df <- generateResultDF(results)
+g <- anyTimePerformancePlot(df[which(df$problemName == "Rastr2D"),],ylog = T, useMinMax = T)
+print(g + ggtitle("Anytime Performance on Rastrigin Function"))
+```
+
+## Pros/Cons
+
+* +Easy task submission on the cluster
+* +Define Algorithms / Objective functions etc. only once, then they can be nicely shared in the same strucutre
+* +Same for Postprocessing etc.
+
+* -Initial Setup
+
+## Automatic Installer
+* Github package ideaBatch
+* devtools::install_github("frehbach/ideaBatch")
+
+

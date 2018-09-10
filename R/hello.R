@@ -29,6 +29,9 @@ initBatchTools <- function() {
     file.copy(system.file("", "slurm.tmpl", package = "ideaBatch"), desiredDir)
     file.copy(system.file("", "slurm.conf.R", package = "ideaBatch"), desiredDir)
     file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T)
     dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
 
     sshInfo <- readSSHInfo(nodeName)
@@ -42,10 +45,28 @@ initBatchTools <- function() {
     idea.config.list <- list("userName" = userName, "sshKey" = sshKey, "nodeName" = nodeName,
                              "desiredDir" = desiredDir, "userDir" = userDir)
     save(idea.config.list,file = paste0(system.file(package = "ideaBatch"),"/config.rda"))
+    file.copy(system.file("", "config.rda", package = "ideaBatch"), desiredDir)
+
+
+    dirExtern <- substring(desiredDir, 3, nchar(desiredDir))
+    insertPathToTemplate(paste0(desiredDir,"/slurm.tmpl"), c(userDir,dirExtern))
+    insertPathToTemplate(paste0(desiredDir,"/slurm.conf.R"), c(desiredDir))
 
     synchronizeFolder()
 
     ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", desiredDir,"/packageInstaller.R"))
+}
+
+insertPathToTemplate <- function(fullPath, paramVector)
+{
+    lines = readLines(fullPath)
+    paramIndex = 1
+    for(p in paramVector)
+    {
+        lines = gsub(paste("#", as.character(paramIndex),"#",sep=""),p,lines)
+        paramIndex = paramIndex + 1
+    }
+    cat(lines,file = fullPath,sep = "\n")
 }
 
 readSSHInfo <- function(nodeName){
@@ -111,7 +132,7 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
     if(useCluster){
         conf.file <- paste0(idea.config.list$desiredDir,"/slurm.conf.R")
     }else{
-        stop("no local conf file supplied!")
+        conf.file <- NULL
     }
     additionalParameters <- list(...)
     additionalParameters$file.dir <- paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir)
@@ -132,12 +153,22 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
 #'
 #' @import batchtools
 #' @import ssh
-ideaSubmitJobs <- function(...){
-    ####
-    ####
-    #### Has To take more params!!!
-    ####
+ideaSubmitJobs <- function(reg, ...){
     params <- list(...)
     synchronizeFolder()
-    do.call(submitJobs, args = params)
+
+    ### Make use of params!
+    ###
+    ###
+    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+    nodeName <- idea.config.list$nodeName
+    sshInfo <- readSSHInfo(nodeName)
+    sshKey <- sshInfo$identFile
+
+    sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+
+    ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ",
+                                              idea.config.list$desiredDir,"/submitJobs.R ",
+                                              get("file.dir",envir = reg), " ",
+                                              idea.config.list$desiredDir, "/slurm.conf.R"))
 }
