@@ -4,7 +4,7 @@
 \alias{ideaSubmitJobs}
 \title{Title}
 \usage{
-ideaSubmitJobs(...)
+ideaSubmitJobs(reg, ...)
 }
 \description{
 Title

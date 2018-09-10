@@ -112,7 +112,7 @@ ideaLoadResultList <- function(reg){
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
 
-    system(paste0("rsync -r -a -v -e ssh --delete owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, " ",dirLocal))
+    system(paste0("rsync -r -a -v -e ssh --delete owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
     reduceResultsList(reg = reg)
 }
 

@@ -2,6 +2,7 @@
 
 export(anyTimePerformancePlot)
 export(generateResultDF)
+export(ideaLoadResultList)
 export(ideaMakeRegistry)
 export(ideaSubmitJobs)
 export(initBatchTools)
