@@ -25,3 +25,6 @@ files <- dir(path)
 for(file in files){
     source(paste0(path,file))
 }
+for(file in files){
+    source(paste0(path,file))
+}
