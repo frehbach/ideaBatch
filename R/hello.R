@@ -164,8 +164,8 @@ ideaSubmitJobs <- function(reg, ...){
 
     sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
 
-    ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ",
+    ssh::ssh_exec_wait(session = sess, paste0("PATH=/opt/software/R/R-current/bin:$PATH ; /opt/software/R/R-current/bin/Rscript ",
                                               idea.config.list$desiredDir,"/submitJobs.R ",
                                               get("file.dir",envir = reg), " ",
-                                              idea.config.list$desiredDir, "/slurm.conf.R"))
+                                              idea.config.list$desiredDir))
 }
