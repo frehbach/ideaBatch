@@ -51,7 +51,9 @@ initBatchTools <- function() {
     dirExtern <- substring(desiredDir, 3, nchar(desiredDir))
     insertPathToTemplate(paste0(desiredDir,"/slurm.tmpl"), c(userDir,dirExtern))
     insertPathToTemplate(paste0(desiredDir,"/slurm.conf.R"), c(desiredDir))
+    insertPathToTemplate(paste0(desiredDir,"/sources.R"), c(desiredDir))
 
+    ssh::ssh_exec_wait(session = sess, paste0("mkdir -p /home/0/",userDir ,"/", dirExtern))
     synchronizeFolder()
 
     ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", desiredDir,"/packageInstaller.R"))
@@ -88,17 +90,17 @@ readSSHInfo <- function(nodeName){
 #' Synchronizes the Experiment folder to the cluster
 #'
 #' @param dir the dir that is synchronized
-synchronizeFolder <- function() {
+synchronizeFolder <- function(doDelete = T) {
     load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
     dir <- idea.config.list$desiredDir
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
 
-    #Problem remaining!!!!!!!
-    #######
-    ##########
-    ##########
-    system(paste0("rsync -r -a -v -e ssh --delete ", dirLocal," owos:/home/0/",idea.config.list$userDir ,"/"))
+    if(doDelete){
+        system(paste0("rsync -r -a --delete -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+    }else{
+        system(paste0("rsync -r -a -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+    }
 }
 
 #' Load experiment results into result list
@@ -106,13 +108,22 @@ synchronizeFolder <- function() {
 #' @param reg The registry from which the results shall be loaded
 #'
 #' @export
-ideaLoadResultList <- function(reg){
+ideaLoadResultList <- function(reg, doDelete = T){
+    if(is.null(reg)){
+        stop()
+    }
+
     load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
     dir <- get("file.dir",reg)
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
 
-    system(paste0("rsync -r -a -v -e ssh --delete owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+    if(doDelete){
+        system(paste0("rsync -r -a --delete -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+    }else{
+        system(paste0("rsync -r -a -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+    }
+
     reduceResultsList(reg = reg)
 }
 
@@ -151,6 +162,11 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
 #' @import batchtools
 #' @import ssh
 ideaSubmitJobs <- function(reg, ...){
+
+    if(is.null(reg)){
+        stop()
+    }
+
     params <- list(...)
     synchronizeFolder()
 
@@ -168,4 +184,58 @@ ideaSubmitJobs <- function(reg, ...){
                                               idea.config.list$desiredDir,"/submitJobs.R ",
                                               get("file.dir",envir = reg), " ",
                                               idea.config.list$desiredDir))
+}
+
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @import batchtools
+#' @import ssh
+updatedPackage <- function(path){
+    if(!endsWith(path,"/")){
+        path <- paste0(path,"/")
+    }
+
+    # Copy configuration file back into package install dir
+    file.copy(paste0(path, "config.rda"), system.file(package = "ideaBatch"))
+    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+
+    sshInfo <- readSSHInfo(idea.config.list$nodeName)
+    sshKey <- sshInfo$identFile
+
+    sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+
+    ## Update Base Files
+    dir <- idea.config.list$desiredDir
+    dirLocal <- dir
+    dirExtern <- substring(dir, 3, nchar(dir))
+    if(!ideaPathIsBaseDir(paste0("/home/0/",idea.config.list$userDir ,"/", dirExtern))){
+        stop("update Package tried to access a path which is note a base directory!")
+    }
+    system(paste0("rsync -d --delete -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+
+    ## Update Package Installation on Cluster
+    ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", idea.config.list$desiredDir,"/packageInstaller.R"))
+}
+
+ideaPathIsBaseDir <- function(path, sess = NULL){
+    if(is.null(sess)){
+        load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+
+        sshInfo <- readSSHInfo(idea.config.list$nodeName)
+        sshKey <- sshInfo$identFile
+
+        sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+    }
+    files <- capture.output(ssh::ssh_exec_wait(session = sess, paste0("ls ", path)))
+
+    shouldBeThere <- c("Experiments", "Sources", "packageInstaller.R", "sources.R")
+    for(file in shouldBeThere){
+        if(!(file %in% files)){
+            return(F)
+        }
+    }
+    return(T)
 }

@@ -34,7 +34,7 @@ generateResultDF <- function(resultList){
 #' @return
 #' @export
 anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL, xLim = NULL, ylog = F
-                                   , xlog = F, useMinMax = F){
+                                   , xlog = F, useMinMax = T){
     require(ggplot2)
 
     dfNames <- c("algoName", "replication", "iteration", "iterBest")
@@ -51,7 +51,7 @@ anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL,
             sdVal <- sd(subData$iterBest[which(subData$iteration == i)])
             n <- length(subData$iterBest[which(subData$iteration == i)])
 
-            if(useMinMax){
+            if(!useMinMax){
                 error <- qnorm(1-(1-confidenceInterval)/2)*sdVal/sqrt(n)
                 min <- meanVal - error
                 max <- meanVal + error

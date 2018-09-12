@@ -19,7 +19,7 @@ if (!require("cmaes",character.only = TRUE))
     require(cmaes)
 }
 
-sourceDir <- getSrcDirectory(function(dummy) {dummy})
+sourceDir <- "#1#"
 path <- paste0(sourceDir,"/Sources/")
 files <- dir(path)
 for(file in files){
