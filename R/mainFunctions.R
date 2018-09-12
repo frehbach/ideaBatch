@@ -97,9 +97,9 @@ synchronizeFolder <- function(doDelete = T) {
     dirExtern <- substring(dir, 3, nchar(dir))
 
     if(doDelete){
-        system(paste0("rsync -r -a --delete -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+        system(paste0("rsync -r -a --delete -e ssh ", dirLocal,"/ ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern))
     }else{
-        system(paste0("rsync -r -a -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+        system(paste0("rsync -r -a -e ssh ", dirLocal,"/ ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern))
     }
 }
 
@@ -120,9 +120,9 @@ ideaLoadResultList <- function(reg, doDelete = T, waitJobs = T){
 
     while(T){
         if(doDelete){
-            system(paste0("rsync -r -a --delete -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+            system(paste0("rsync -r -a --delete -e ssh ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
         }else{
-            system(paste0("rsync -r -a -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+            system(paste0("rsync -r -a -e ssh ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
         }
         if(waitJobs){
             if(length(unlist(findDone())) == length(unlist(findExperiments()))){
@@ -225,7 +225,7 @@ updatedPackage <- function(path){
     if(!ideaPathIsBaseDir(paste0("/home/0/",idea.config.list$userDir ,"/", dirExtern))){
         stop("update Package tried to access a path which is note a base directory!")
     }
-    system(paste0("rsync -d --delete -e ssh ", dirLocal,"/ owos:/home/0/",idea.config.list$userDir ,"/", dirExtern))
+    system(paste0("rsync -d --delete -e ssh ", dirLocal,"/ ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern))
 
     ## Update Package Installation on Cluster
     ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", idea.config.list$desiredDir,"/packageInstaller.R"))
