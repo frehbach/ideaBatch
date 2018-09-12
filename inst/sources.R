@@ -1,22 +1,18 @@
 if (!require("CEGO",character.only = TRUE))
 {
-    install.packages("CEGO",dep=TRUE)
-    require(CEGO)
+    stop("Something went wrong in the setup, Please install CEGO on the cluster!!")
 }
 if (!require("SPOT",character.only = TRUE))
 {
-    install.packages("SPOT",dep=TRUE)
-    require(SPOT)
+    stop("Something went wrong in the setup, Please install SPOT on the cluster!!")
 }
 if (!require("smoof",character.only = TRUE))
 {
-    install.packages("smoof",dep=TRUE)
-    require(smoof)
+    stop("Something went wrong in the setup, Please install smoof on the cluster!!")
 }
 if (!require("cmaes",character.only = TRUE))
 {
-    install.packages("cmaes",dep=TRUE)
-    require(cmaes)
+    stop("Something went wrong in the setup, Please install cmaes on the cluster!!")
 }
 
 sourceDir <- "#1#"

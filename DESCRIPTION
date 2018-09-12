@@ -19,6 +19,7 @@ Depends:
 Imports: 
     SPOT,
     CEGO,
+    cmaes,
     ssh
 Suggests: testthat, utils
 License: GPL-3
