@@ -1,7 +1,9 @@
 
-#' Title
+#' Initiate ideaBatch package
 #'
-#' @return
+#' Initiate the ideaBatch package, install all requirements on the cluster copy files,
+#' create your user config.
+#'
 #' @export
 #'
 #' @import batchtools
@@ -59,6 +61,15 @@ initBatchTools <- function() {
     ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", desiredDir,"/packageInstaller.R"))
 }
 
+#' Insert Variable into file
+#'
+#' Scans thorugh a file looking for codes in the form of e.g. #1# or #2# etc.
+#' Parameters are filled from paramVector into the file
+#'
+#' @keywords internal
+#'
+#' @import batchtools
+#' @import ssh
 insertPathToTemplate <- function(fullPath, paramVector)
 {
     lines = readLines(fullPath)
@@ -71,6 +82,18 @@ insertPathToTemplate <- function(fullPath, paramVector)
     cat(lines,file = fullPath,sep = "\n")
 }
 
+#' Parse ssh-config file
+#'
+#' Scans through the .ssh/config file looking for a configuration with the given nodeName
+#'
+#' @param nodeName string with the name to search for
+#'
+#' @return server info list
+#'
+#' @keywords internal
+#'
+#' @import batchtools
+#' @import ssh
 readSSHInfo <- function(nodeName){
     sshConfig <- read.table("~/.ssh/config",sep=" ",blank.lines.skip = F)
     hostIndex <- which(sshConfig$V2 == nodeName)
@@ -249,4 +272,29 @@ ideaPathIsBaseDir <- function(path, sess = NULL){
         }
     }
     return(T)
+}
+
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @import batchtools
+#' @import ssh
+ideaTutorial <- function(index = NULL) {
+    tutorialFiles <- dir(system.file("Tutorials",package="ideaBatch"))
+    tutorials <- tutorialFiles[grep(pattern = ".html", tutorialFiles)]
+
+    if(is.null(index)){
+        print(tutorials)
+    }else{
+        if(!is.numeric(index)){
+            stop("Index was not numeric")
+        }
+        indexes <- as.numeric(unlist(regmatches(tutorials, gregexpr("[[:digit:]]+", tutorials))))
+        if(!(index %in% indexes)){
+            stop("This tutorial does not exist")
+        }
+        browseURL(paste0(system.file("Tutorials",package="ideaBatch"), "/", tutorials[which(indexes == index)]))
+    }
 }
