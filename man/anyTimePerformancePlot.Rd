@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 anyTimePerformancePlot(data, confidenceInterval = 0.95, yLim = NULL,
-  xLim = NULL, ylog = F, xlog = F, useMinMax = F)
+  xLim = NULL, ylog = F, xlog = F, useMinMax = T)
 }
 \description{
 Title

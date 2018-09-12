@@ -108,7 +108,7 @@ synchronizeFolder <- function(doDelete = T) {
 #' @param reg The registry from which the results shall be loaded
 #'
 #' @export
-ideaLoadResultList <- function(reg, doDelete = T){
+ideaLoadResultList <- function(reg, doDelete = T, waitJobs = T){
     if(is.null(reg)){
         stop()
     }
@@ -118,10 +118,21 @@ ideaLoadResultList <- function(reg, doDelete = T){
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))
 
-    if(doDelete){
-        system(paste0("rsync -r -a --delete -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
-    }else{
-        system(paste0("rsync -r -a -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+    while(T){
+        if(doDelete){
+            system(paste0("rsync -r -a --delete -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+        }else{
+            system(paste0("rsync -r -a -e ssh owos:/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+        }
+        if(waitJobs){
+            if(length(unlist(findDone())) == length(unlist(findExperiments()))){
+                break
+            }else{
+                Sys.sleep(0.5)
+            }
+        }else{
+            break
+        }
     }
 
     reduceResultsList(reg = reg)
