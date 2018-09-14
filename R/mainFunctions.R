@@ -161,9 +161,14 @@ ideaLoadResultList <- function(reg, doDelete = T, waitJobs = T){
     reduceResultsList(reg = reg)
 }
 
-#' Title
+#' Create an IDE+A structured Registry
 #'
-#' @return
+#' @param mainDir The main directy for your registry to be stored in. E.g. if you are
+#' doing experiments for a paper it might be the name of the paper your testing for: 'rehb18c'
+#' @param subDir Some dir name that is stored in mainDir. E.g. "Test1", "KrigingOnESP"...
+#' @param useCluster boolean, defaults to True shows wether the cluster shall be used or
+#' if you want to run the experiments locally on your own laptop
+#'
 #' @export
 #'
 #' @import batchtools
