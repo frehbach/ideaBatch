@@ -2,10 +2,19 @@
 % Please edit documentation in R/mainFunctions.R
 \name{ideaMakeRegistry}
 \alias{ideaMakeRegistry}
-\title{Title}
+\title{Create an IDE+A structured Registry}
 \usage{
 ideaMakeRegistry(mainDir, subDir, useCluster = T, ...)
 }
+\arguments{
+\item{mainDir}{The main directy for your registry to be stored in. E.g. if you are
+doing experiments for a paper it might be the name of the paper your testing for: 'rehb18c'}
+
+\item{subDir}{Some dir name that is stored in mainDir. E.g. "Test1", "KrigingOnESP"...}
+
+\item{useCluster}{boolean, defaults to True shows wether the cluster shall be used or
+if you want to run the experiments locally on your own laptop}
+}
 \description{
-Title
+Create an IDE+A structured Registry
 }

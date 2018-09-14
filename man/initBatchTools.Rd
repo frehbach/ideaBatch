@@ -2,10 +2,11 @@
 % Please edit documentation in R/mainFunctions.R
 \name{initBatchTools}
 \alias{initBatchTools}
-\title{Title}
+\title{Initiate ideaBatch package}
 \usage{
 initBatchTools()
 }
 \description{
-Title
+Initiate the ideaBatch package, install all requirements on the cluster copy files,
+create your user config.
 }
