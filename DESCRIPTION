@@ -2,7 +2,7 @@ Package: ideaBatch
 Version: 0.0.1
 Date: 2018-09-03
 Title: Package 'batchtools' for IDE+A
-Description: Package 'batchtools' for IDE+A
+Description: 'ideaBatch' is an R-Package for the internal use in the IDE+A institute. It's an installation wrapper around the 'batchtools' R-package: https://github.com/mllg/batchtools
 Author: Frederik Rehbach [aut, cre]
 Authors@R: 
   c(
