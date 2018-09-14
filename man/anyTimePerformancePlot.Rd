@@ -2,11 +2,29 @@
 % Please edit documentation in R/anyTimePlot.R
 \name{anyTimePerformancePlot}
 \alias{anyTimePerformancePlot}
-\title{Title}
+\title{Create an anytimePerformancePlot}
 \usage{
-anyTimePerformancePlot(data, confidenceInterval = 0.95, yLim = NULL,
-  xLim = NULL, ylog = F, xlog = F, useMinMax = T)
+anyTimePerformancePlot(data, yLim = NULL, xLim = NULL, ylog = F,
+  xlog = F, useMinMax = T, confidenceInterval = 0.95)
+}
+\arguments{
+\item{data}{The data you wish to plot. (Should usually be only data of 1 objective function)}
+
+\item{yLim}{Limits for y axis}
+
+\item{xLim}{limits for x axis}
+
+\item{ylog}{Logarithmic y axis?}
+
+\item{xlog}{Logarithmic x axis?}
+
+\item{useMinMax}{If T Min and max are plotted, otherwise confidenceintervals}
+
+\item{confidenceInterval}{If useMinMax = F this sets the confidenceIntervals which are plotted}
+}
+\value{
+A ggplot
 }
 \description{
-Title
+Create an anytimePerformancePlot
 }

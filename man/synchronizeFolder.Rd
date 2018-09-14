@@ -7,7 +7,7 @@
 synchronizeFolder(doDelete = T)
 }
 \arguments{
-\item{dir}{the dir that is synchronized}
+\item{doDelete}{Whether or not the deletion option should be on in the rsync command}
 }
 \description{
 Synchronizes the Experiment folder to the cluster

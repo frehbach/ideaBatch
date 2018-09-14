@@ -2,10 +2,16 @@
 % Please edit documentation in R/anyTimePlot.R
 \name{generateResultDF}
 \alias{generateResultDF}
-\title{Title}
+\title{Compile the 'batchtools' result list into a data.frame}
 \usage{
 generateResultDF(resultList)
 }
+\arguments{
+\item{resultList}{the list you get by ideaLoadResultList}
+}
+\value{
+resultDF
+}
 \description{
-Title
+Currently uses FR format for FR's plots, ask me ;-)
 }

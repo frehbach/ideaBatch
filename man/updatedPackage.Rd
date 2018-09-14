@@ -2,10 +2,15 @@
 % Please edit documentation in R/mainFunctions.R
 \name{updatedPackage}
 \alias{updatedPackage}
-\title{Title}
+\title{UpdatedPackage}
 \usage{
 updatedPackage(path)
 }
+\arguments{
+\item{path}{The path to your main Project folder}
+}
 \description{
-Title
+This method should be called each time you install an update of the 'ideaBatch'-package.
+Without this functions updates will break your package! Your config goes missing and the cluster runs
+different files and versions than you do locally!!
 }

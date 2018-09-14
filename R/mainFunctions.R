@@ -112,7 +112,7 @@ readSSHInfo <- function(nodeName){
 #'
 #' Synchronizes the Experiment folder to the cluster
 #'
-#' @param dir the dir that is synchronized
+#' @param doDelete Whether or not the deletion option should be on in the rsync command
 synchronizeFolder <- function(doDelete = T) {
     load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
     dir <- idea.config.list$desiredDir
@@ -129,9 +129,12 @@ synchronizeFolder <- function(doDelete = T) {
 #' Load experiment results into result list
 #'
 #' @param reg The registry from which the results shall be loaded
+#' @param doDelete Whether or not the deletion option should be on in the rsync command
+#' @param waitJobs Should the function wait for job completion? If False (default) it will not wait but might be missing
+#' jobs which are still running
 #'
 #' @export
-ideaLoadResultList <- function(reg, doDelete = T, waitJobs = T){
+ideaLoadResultList <- function(reg, doDelete = T, waitJobs = F){
     if(is.null(reg)){
         stop()
     }
@@ -163,11 +166,14 @@ ideaLoadResultList <- function(reg, doDelete = T, waitJobs = T){
 
 #' Create an IDE+A structured Registry
 #'
+#' Wrapper for batchtools::makeRegistry
+#'
 #' @param mainDir The main directy for your registry to be stored in. E.g. if you are
 #' doing experiments for a paper it might be the name of the paper your testing for: 'rehb18c'
 #' @param subDir Some dir name that is stored in mainDir. E.g. "Test1", "KrigingOnESP"...
 #' @param useCluster boolean, defaults to True shows wether the cluster shall be used or
 #' if you want to run the experiments locally on your own laptop
+#' @param ... Additional parameters passed to batchtools::makeRegistry
 #'
 #' @export
 #'
@@ -193,9 +199,14 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
     }
 }
 
-#' Title
+#' Submit Jobs
 #'
-#' @return
+#' A wrapper around batchtools::submitJobs.
+#' The wrapper is necessary to implement rsync usage to synchronize local files with the cluster.
+#'
+#' @param reg An IDE+A Registry
+#' @param ... Additional parameters passed to batchtools::submitJobs
+#'
 #' @export
 #'
 #' @import batchtools
@@ -225,9 +236,14 @@ ideaSubmitJobs <- function(reg, ...){
                                               idea.config.list$desiredDir))
 }
 
-#' Title
+#' UpdatedPackage
 #'
-#' @return
+#' This method should be called each time you install an update of the 'ideaBatch'-package.
+#' Without this functions updates will break your package! Your config goes missing and the cluster runs
+#' different files and versions than you do locally!!
+#'
+#' @param path The path to your main Project folder
+#'
 #' @export
 #'
 #' @import batchtools
@@ -259,6 +275,12 @@ updatedPackage <- function(path){
     ssh::ssh_exec_wait(session = sess, paste0("/opt/software/R/R-current/bin/Rscript ", idea.config.list$desiredDir,"/packageInstaller.R"))
 }
 
+#' ideaPathIsBaseDir
+#'
+#' Check if a path is really a registry dear before you delete it etc.
+#'
+#' @param path path to the folder
+#' @param sess SSH session
 ideaPathIsBaseDir <- function(path, sess = NULL){
     if(is.null(sess)){
         load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
@@ -279,9 +301,14 @@ ideaPathIsBaseDir <- function(path, sess = NULL){
     return(T)
 }
 
-#' Title
+#' Run or list ideaTutorials
 #'
-#' @return
+#' There are some tutorials for the usage of the ideaBatch and batchtools package available.
+#' You can list them by simply typing 'ideaTutorial()'. You will get a list of available tutorials.
+#' By specifying the tutorial index you can open a document: e.g. 'ideaTutorial(1)'
+#'
+#' @param index Integer, index of which tutorial to run. If NULL (default) all tutorials will be listed.
+#'
 #' @export
 #'
 #' @import batchtools

@@ -4,10 +4,15 @@
 \alias{ideaLoadResultList}
 \title{Load experiment results into result list}
 \usage{
-ideaLoadResultList(reg, doDelete = T, waitJobs = T)
+ideaLoadResultList(reg, doDelete = T, waitJobs = F)
 }
 \arguments{
 \item{reg}{The registry from which the results shall be loaded}
+
+\item{doDelete}{Whether or not the deletion option should be on in the rsync command}
+
+\item{waitJobs}{Should the function wait for job completion? If False (default) it will not wait but might be missing
+jobs which are still running}
 }
 \description{
 Load experiment results into result list

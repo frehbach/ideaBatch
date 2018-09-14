@@ -14,7 +14,9 @@ doing experiments for a paper it might be the name of the paper your testing for
 
 \item{useCluster}{boolean, defaults to True shows wether the cluster shall be used or
 if you want to run the experiments locally on your own laptop}
+
+\item{...}{Additional parameters passed to batchtools::makeRegistry}
 }
 \description{
-Create an IDE+A structured Registry
+Wrapper for batchtools::makeRegistry
 }

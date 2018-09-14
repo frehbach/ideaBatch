@@ -1,6 +1,10 @@
-#' Title
+#' Compile the 'batchtools' result list into a data.frame
 #'
-#' @return
+#' Currently uses FR format for FR's plots, ask me ;-)
+#'
+#' @param resultList the list you get by ideaLoadResultList
+#'
+#' @return resultDF
 #' @export
 generateResultDF <- function(resultList){
     resultDF <- data.frame(algoName=character(),
@@ -29,13 +33,21 @@ generateResultDF <- function(resultList){
     resultDF
 }
 
-#' Title
+#' Create an anytimePerformancePlot
 #'
-#' @return
+#' @param data The data you wish to plot. (Should usually be only data of 1 objective function)
+#' @param yLim Limits for y axis
+#' @param xLim limits for x axis
+#' @param ylog Logarithmic y axis?
+#' @param xlog Logarithmic x axis?
+#' @param useMinMax If T Min and max are plotted, otherwise confidenceintervals
+#' @param confidenceInterval If useMinMax = F this sets the confidenceIntervals which are plotted
+#'
+#' @return A ggplot
 #' @export
-anyTimePerformancePlot <- function(data, confidenceInterval = 0.95, yLim = NULL, xLim = NULL, ylog = F
-                                   , xlog = F, useMinMax = T){
-    require(ggplot2)
+anyTimePerformancePlot <- function(data, yLim = NULL, xLim = NULL, ylog = F
+                                   , xlog = F, useMinMax = T, confidenceInterval = 0.95){
+    requireNamespace(ggplot2)
 
     dfNames <- c("algoName", "replication", "iteration", "iterBest")
     if(!all(dfNames %in% names(data))){
