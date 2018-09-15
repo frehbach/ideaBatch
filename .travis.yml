@@ -5,6 +5,16 @@ cache: packages
 
 sudo: required
 
+addons:
+    apt:
+        config:
+            retries: true
+        sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+        packages:
+            - libssh-dev
+
 r_github_packages:
   - jimhester/covr
   - frehbach/ideaBatch
