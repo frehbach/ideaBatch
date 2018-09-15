@@ -47,8 +47,6 @@ generateResultDF <- function(resultList){
 #' @export
 anyTimePerformancePlot <- function(data, yLim = NULL, xLim = NULL, ylog = F
                                    , xlog = F, useMinMax = T, confidenceInterval = 0.95){
-    requireNamespace(ggplot2)
-
     dfNames <- c("algoName", "replication", "iteration", "iterBest")
     if(!all(dfNames %in% names(data))){
         stop("Wrong df names were provided")
@@ -87,15 +85,15 @@ anyTimePerformancePlot <- function(data, yLim = NULL, xLim = NULL, ylog = F
     plotDF$min <- as.numeric(levels(plotDF$min))[plotDF$min]
     plotDF$max <- as.numeric(levels(plotDF$max))[plotDF$max]
 
-    h <- ggplot(plotDF, aes(x = iteration, y = mean, color = algoName)) + geom_line()
-    h <- h + geom_ribbon(aes(ymin = min, ymax = max, fill = algoName), alpha = 0.2, show.legend = F)
+    h <- ggplot2::ggplot(plotDF, aes(x = iteration, y = mean, color = algoName)) + ggplot2::geom_line()
+    h <- h + ggplot2::geom_ribbon(aes(ymin = min, ymax = max, fill = algoName), alpha = 0.2, show.legend = F)
     if(ylog){
-        h <- h + scale_y_log10()
+        h <- h + ggplot2::scale_y_log10()
     }
     if(xlog){
-        h <- h + scale_x_log10()
+        h <- h + ggplot2::scale_x_log10()
     }
-    h <- h + coord_cartesian(ylim = yLim, xlim = xLim)
-    h <- h + scale_colour_manual(name = "Algorithm:",values=c("red","blue","black", "green", "yellow"))
+    h <- h + ggplot2::coord_cartesian(ylim = yLim, xlim = xLim)
+    h <- h + ggplot2::scale_colour_manual(name = "Algorithm:",values=c("red","blue","black", "green", "yellow"))
     h
 }

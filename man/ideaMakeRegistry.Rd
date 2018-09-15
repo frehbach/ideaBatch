@@ -2,7 +2,7 @@
 % Please edit documentation in R/mainFunctions.R
 \name{ideaMakeRegistry}
 \alias{ideaMakeRegistry}
-\title{Create an IDE+A structured Registry}
+\title{Create or load an IDE+A structured Registry}
 \usage{
 ideaMakeRegistry(mainDir, subDir, useCluster = T, ...)
 }
@@ -19,4 +19,5 @@ if you want to run the experiments locally on your own laptop}
 }
 \description{
 Wrapper for batchtools::makeRegistry
+If a registry in the desired directory already exists, it is loaded.
 }
