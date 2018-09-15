@@ -290,8 +290,8 @@ ideaPathIsBaseDir <- function(path, sess = NULL){
 
         sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
     }
-    files <- capture.output(ssh::ssh_exec_wait(session = sess, paste0("ls ", path)))
 
+    files <- capture.output(ssh::ssh_exec_wait(session = sess, paste0("ls ", path)))
     shouldBeThere <- c("Experiments", "Sources", "packageInstaller.R", "sources.R")
     for(file in shouldBeThere){
         if(!(file %in% files)){
