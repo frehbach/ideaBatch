@@ -164,9 +164,10 @@ ideaLoadResultList <- function(reg, doDelete = T, waitJobs = F){
     reduceResultsList(reg = reg)
 }
 
-#' Create an IDE+A structured Registry
+#' Create or load an IDE+A structured Registry
 #'
 #' Wrapper for batchtools::makeRegistry
+#' If a registry in the desired directory already exists, it is loaded.
 #'
 #' @param mainDir The main directy for your registry to be stored in. E.g. if you are
 #' doing experiments for a paper it might be the name of the paper your testing for: 'rehb18c'
@@ -193,7 +194,8 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
     additionalParameters$work.dir <- idea.config.list$desiredDir
 
     reg <- NULL
-    reg <- try(batchtools::loadRegistry(file.dir = paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir),writeable = T))
+    reg <- try(batchtools::loadRegistry(file.dir = paste0(
+        idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir),writeable = T),silent = T)
     if(is.null(reg) || is.error(reg)){
         do.call(batchtools::makeExperimentRegistry, args = additionalParameters)
     }
