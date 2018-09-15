@@ -5,7 +5,7 @@ test_that("Tutorials work correctly", {
 
     expect_equal(length(ideaTutorial()), length(currentlyExistingTutorials))
     for(e in ideaTutorial()){
-        expect_true(check_string(e))
+        expect_true(checkmate::check_string(e))
     }
 
     expect_error(ideaTutorial(-1), regexp = "tutorial")
