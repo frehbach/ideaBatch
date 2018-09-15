@@ -4,7 +4,7 @@ Date: 2018-09-03
 Title: Package 'batchtools' for IDE+A
 Description: 'ideaBatch' is an R-Package for the internal use in the IDE+A institute. It's an installation wrapper around the 'batchtools' R-package: https://github.com/mllg/batchtools
 Author: Frederik Rehbach [aut, cre]
-Authors@R: 
+Authors@R:
   c(
   person("Frederik", "Rehbach", email="frederik.re@gmail.com", role=c("aut", "cre"))
   )
@@ -16,13 +16,13 @@ Depends:
     R (>= 3.0.1),
     smoof,
     batchtools
-Imports: 
+Imports:
     SPOT,
     CEGO,
     cmaes,
-    ssh
+    ssh,
+    checkmate
 Suggests: testthat, utils
-License: GPL-3
+License: GPL-3 + file LICENSE
 VignetteBuilder: utils
 RoxygenNote: 6.0.1
-
