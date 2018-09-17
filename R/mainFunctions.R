@@ -27,15 +27,6 @@ initBatchTools <- function() {
         desiredDir <- substring(desiredDir,1,nchar(desiredDir)-1)
     }
 
-    dir.create(desiredDir, showWarnings = FALSE)
-    file.copy(system.file("", "slurm.tmpl", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "slurm.conf.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T)
-    dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
-
     sshInfo <- readSSHInfo(nodeName)
     sshKey <- sshInfo$identFile
 
@@ -47,14 +38,9 @@ initBatchTools <- function() {
     idea.config.list <- list("userName" = userName, "sshKey" = sshKey, "nodeName" = nodeName,
                              "desiredDir" = desiredDir, "userDir" = userDir)
     save(idea.config.list,file = paste0(system.file(package = "ideaBatch"),"/config.rda"))
-    file.copy(system.file("", "config.rda", package = "ideaBatch"), desiredDir)
 
-
+    prepareBaseFiles()
     dirExtern <- substring(desiredDir, 3, nchar(desiredDir))
-    insertPathToTemplate(paste0(desiredDir,"/slurm.tmpl"), c(userDir,dirExtern))
-    insertPathToTemplate(paste0(desiredDir,"/slurm.conf.R"), c(desiredDir))
-    insertPathToTemplate(paste0(desiredDir,"/sources.R"), c(desiredDir))
-
     ssh::ssh_exec_wait(session = sess, paste0("mkdir -p /home/0/",userDir ,"/", dirExtern))
     synchronizeFolder()
 
@@ -238,6 +224,35 @@ ideaSubmitJobs <- function(reg, ...){
                                               idea.config.list$desiredDir))
 }
 
+
+#' prepareBaseFiles
+#'
+#' Copies all required files from the package installation folder to the user specified foder
+prepareBaseFiles <- function(){
+    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+    desiredDir <- idea.config.list$desiredDir
+    userDir <- idea.config.list$userDir
+
+    dir.create(desiredDir, showWarnings = FALSE)
+    file.copy(system.file("", "slurm.tmpl", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "slurm.conf.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "batchtools.conf.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T)
+    dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
+
+
+    file.copy(system.file("", "config.rda", package = "ideaBatch"), desiredDir)
+
+    dirExtern <- substring(desiredDir, 3, nchar(desiredDir))
+    insertPathToTemplate(paste0(desiredDir,"/slurm.tmpl"), c(userDir,dirExtern))
+    insertPathToTemplate(paste0(desiredDir,"/slurm.conf.R"), c(desiredDir))
+    insertPathToTemplate(paste0(desiredDir,"/batchtools.conf.R"), c(desiredDir))
+    insertPathToTemplate(paste0(desiredDir,"/sources.R"), c(desiredDir))
+}
+
 #' UpdatedPackage
 #'
 #' This method should be called each time you install an update of the 'ideaBatch'-package.
@@ -265,6 +280,8 @@ updatedPackage <- function(path){
     sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
 
     ## Update Base Files
+    prepareBaseFiles()
+
     dir <- idea.config.list$desiredDir
     dirLocal <- dir
     dirExtern <- substring(dir, 3, nchar(dir))

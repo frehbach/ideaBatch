@@ -31,7 +31,7 @@ A registry is basically just a folder containing the organization structure of t
 E.g. a results folder, a logs folder etc.
 ```{r echo=TRUE, results='hide', message=FALSE}
 ## Create an Experiment Registry with a Dir-Name and a Sub-Directory for each test.
-reg <- ideaMakeRegistry("Tutorials","Tutorial_1") 
+reg <- ideaMakeRegistry("Tutorials","Tutorial_1", useCluster = T) 
 
 ## Add Objective Functions
 addProblem("Rosen2D", of_smoofByName("Rosenbrock",2))
