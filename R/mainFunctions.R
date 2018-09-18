@@ -131,10 +131,14 @@ ideaLoadResultList <- function(reg, doDelete = T, waitJobs = F){
     dirExtern <- substring(dir, 3, nchar(dir))
 
     while(T){
-        if(doDelete){
-            system(paste0("rsync -r -a --delete -e ssh ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
-        }else{
-            system(paste0("rsync -r -a -e ssh ",idea.config.list$nodeName,":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+        if(!(get("cluster.functions", reg)$name == "Interactive")){
+            if(doDelete){
+                system(paste0("rsync -r -a --delete -e ssh ",idea.config.list$nodeName,
+                              ":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+            }else{
+                system(paste0("rsync -r -a -e ssh ",idea.config.list$nodeName,
+                              ":/home/0/",idea.config.list$userDir ,"/", dirExtern, "/ ",dirLocal))
+            }
         }
         if(waitJobs){
             if(length(unlist(findDone())) == length(unlist(findExperiments()))){
@@ -172,7 +176,7 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
     if(useCluster){
         conf.file <- paste0(idea.config.list$desiredDir,"/slurm.conf.R")
     }else{
-        conf.file <- NULL
+        conf.file <- paste0(idea.config.list$desiredDir,"/batchtools.conf.R")
     }
     additionalParameters <- list(...)
     additionalParameters$file.dir <- paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir)
@@ -211,17 +215,23 @@ ideaSubmitJobs <- function(reg, ...){
     ### Make use of params!
     ###
     ###
-    load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
-    nodeName <- idea.config.list$nodeName
-    sshInfo <- readSSHInfo(nodeName)
-    sshKey <- sshInfo$identFile
 
-    sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+    if(get("cluster.functions", reg)$name == "Interactive"){
+        additionalParameters <- list(...)
+        do.call(batchtools::submitJobs, args = additionalParameters)
+    }else{
+        load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
+        nodeName <- idea.config.list$nodeName
+        sshInfo <- readSSHInfo(nodeName)
+        sshKey <- sshInfo$identFile
 
-    ssh::ssh_exec_wait(session = sess, paste0("PATH=/opt/software/R/R-current/bin:$PATH ; /opt/software/R/R-current/bin/Rscript ",
-                                              idea.config.list$desiredDir,"/submitJobs.R ",
-                                              get("file.dir",envir = reg), " ",
-                                              idea.config.list$desiredDir))
+        sess <- ssh::ssh_connect(host = paste0(sshInfo$user,"@",sshInfo$hostName),keyfile = sshInfo$identFile)
+
+        ssh::ssh_exec_wait(session = sess, paste0("PATH=/opt/software/R/R-current/bin:$PATH ; /opt/software/R/R-current/bin/Rscript ",
+                                                  idea.config.list$desiredDir,"/submitJobs.R ",
+                                                  get("file.dir",envir = reg), " ",
+                                                  idea.config.list$desiredDir))
+    }
 }
 
 
