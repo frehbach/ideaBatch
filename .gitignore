@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+inst/Sources/cfdESPMinFid
+.DS_Store
+inst/config.rda
+inst/Sources/sourceESP.R
