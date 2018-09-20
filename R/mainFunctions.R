@@ -246,17 +246,17 @@ prepareBaseFiles <- function(){
     userDir <- idea.config.list$userDir
 
     dir.create(desiredDir, showWarnings = FALSE)
-    file.copy(system.file("", "slurm.tmpl", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "slurm.conf.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "batchtools.conf.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir)
-    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T)
+    file.copy(system.file("", "slurm.tmpl", package = "ideaBatch"), desiredDir , overwrite = T)
+    file.copy(system.file("", "slurm.conf.R", package = "ideaBatch"), desiredDir, overwrite = T)
+    file.copy(system.file("", "batchtools.conf.R", package = "ideaBatch"), desiredDir, overwrite = T)
+    file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir, overwrite = T)
+    file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir, overwrite = T)
+    file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir, overwrite = T)
+    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T, overwrite = T)
     dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
 
 
-    file.copy(system.file("", "config.rda", package = "ideaBatch"), desiredDir)
+    file.copy(system.file("", "config.rda", package = "ideaBatch"), desiredDir, overwrite = T)
 
     dirExtern <- substring(desiredDir, 3, nchar(desiredDir))
     insertPathToTemplate(paste0(desiredDir,"/slurm.tmpl"), c(userDir,dirExtern))
@@ -283,7 +283,7 @@ updatedPackage <- function(path){
     }
 
     # Copy configuration file back into package install dir
-    file.copy(paste0(path, "config.rda"), system.file(package = "ideaBatch"))
+    file.copy(paste0(path, "config.rda"), system.file(package = "ideaBatch"), overwrite = T)
     load(paste0(system.file(package = "ideaBatch"),"/config.rda"))
 
     sshInfo <- readSSHInfo(idea.config.list$nodeName)
