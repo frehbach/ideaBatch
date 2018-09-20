@@ -209,6 +209,8 @@ ideaSubmitJobs <- function(reg, ...){
         stop()
     }
 
+    save.image(file = paste0(reg$file.dir,"/img.rda"))
+
     params <- list(...)
     synchronizeFolder()
 

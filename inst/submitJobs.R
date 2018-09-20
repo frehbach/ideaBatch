@@ -5,5 +5,7 @@ regFileDir <- args[1]
 mainFileDir <- args[2]
 configFileDir <- paste0(mainFileDir,"/slurm.conf.R")
 
-loadRegistry(regFileDir, conf.file=configFileDir, writeable=T)
+reg <- loadRegistry(regFileDir, conf.file=configFileDir, writeable=T)
+load(file = paste0(reg$file.dir,"/img.rda"))
+
 submitJobs()
