@@ -184,11 +184,14 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
     additionalParameters$work.dir <- idea.config.list$desiredDir
 
     reg <- NULL
-    reg <- try(batchtools::loadRegistry(file.dir = paste0(
-        idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir),writeable = T),silent = T)
+    reg <- try(batchtools::loadRegistry(
+        file.dir = paste0(idea.config.list$desiredDir,"/Experiments/",mainDir,"/",subDir),
+        writeable = T,
+        conf.file = additionalParameters$conf.file),silent = T)
     if(is.null(reg) || is.error(reg)){
         do.call(batchtools::makeExperimentRegistry, args = additionalParameters)
     }
+    reg
 }
 
 #' Submit Jobs
@@ -208,8 +211,6 @@ ideaSubmitJobs <- function(reg, ...){
     if(is.null(reg)){
         stop()
     }
-
-    save.image(file = paste0(reg$file.dir,"/img.rda"))
 
     params <- list(...)
     synchronizeFolder()
