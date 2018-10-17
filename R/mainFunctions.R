@@ -189,7 +189,7 @@ ideaMakeRegistry <- function(mainDir, subDir, useCluster = T, ...) {
         writeable = T,
         conf.file = additionalParameters$conf.file),silent = T)
     if(is.null(reg) || is.error(reg)){
-        do.call(batchtools::makeExperimentRegistry, args = additionalParameters)
+        reg <- do.call(batchtools::makeExperimentRegistry, args = additionalParameters)
     }
     reg
 }
