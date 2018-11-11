@@ -212,15 +212,11 @@ ideaSubmitJobs <- function(reg, ...){
         stop()
     }
 
-    params <- list(...)
+    additionalParameters <- list(...)
+    saveRDS(additionalParameters, file = paste0(reg$file.dir, "/additionalParameters.rds"))
     synchronizeFolder()
 
-    ### Make use of params!
-    ###
-    ###
-
     if(get("cluster.functions", reg)$name == "Interactive"){
-        additionalParameters <- list(...)
         do.call(batchtools::submitJobs, args = additionalParameters)
     }else{
         load(paste0(system.file(package = "ideaBatch"),"/config.rda"))

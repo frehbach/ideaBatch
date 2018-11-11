@@ -7,4 +7,6 @@ configFileDir <- paste0(mainFileDir,"/slurm.conf.R")
 
 reg <- loadRegistry(regFileDir, conf.file=configFileDir, writeable=T)
 
-submitJobs()
+additionalParameters <- readRDS(file = paste0(reg$file.dir, "/additionalParameters.rds"))
+
+do.call(batchtools::submitJobs, args = additionalParameters)
