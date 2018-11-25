@@ -249,7 +249,7 @@ prepareBaseFiles <- function(){
     file.copy(system.file("", "packageInstaller.R", package = "ideaBatch"), desiredDir, overwrite = T)
     file.copy(system.file("", "sources.R", package = "ideaBatch"), desiredDir, overwrite = T)
     file.copy(system.file("", "submitJobs.R", package = "ideaBatch"), desiredDir, overwrite = T)
-    file.copy(system.file("", "Sources/", package = "ideaBatch"), desiredDir, recursive = T, overwrite = T)
+    file.copy(system.file("", "R/", package = "ideaBatch"), desiredDir, recursive = T, overwrite = T)
     dir.create(paste0(desiredDir ,"/Experiments"), showWarnings = FALSE)
 
 
@@ -320,7 +320,7 @@ ideaPathIsBaseDir <- function(path, sess = NULL){
     }
 
     files <- capture.output(ssh::ssh_exec_wait(session = sess, paste0("ls ", path)))
-    shouldBeThere <- c("Experiments", "Sources", "packageInstaller.R", "sources.R")
+    shouldBeThere <- c("Experiments", "R", "packageInstaller.R", "sources.R")
     for(file in shouldBeThere){
         if(!(file %in% files)){
             return(F)
