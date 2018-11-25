@@ -95,6 +95,8 @@ anyTimePerformancePlot <- function(data, yLim = NULL, xLim = NULL, ylog = F
         h <- h + ggplot2::scale_x_log10()
     }
     h <- h + ggplot2::coord_cartesian(ylim = yLim, xlim = xLim)
-    h <- h + ggplot2::scale_colour_manual(name = "Algorithm:",values=c("red","blue","black", "green", "yellow"))
+    h <- h + ggplot2::scale_colour_manual(name = "Algorithm:",values=c("red","blue","black",
+                                                                       "green", "yellow", "brown",
+                                                                       "orange","pink"))
     h
 }
