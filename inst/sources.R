@@ -16,7 +16,7 @@ if (!require("cmaes",character.only = TRUE))
 }
 
 sourceDir <- "#1#"
-path <- paste0(sourceDir,"/Sources/")
+path <- paste0(sourceDir,"/R/")
 files <- dir(path)
 for(file in files){
     source(paste0(path,file))
