@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## In this tutorial you will learn:
 * How to add algorithm settings / configurations to your runs
 * How to restart / or change already existing experiments
+* Exporting Objects to the cluster
 
 Basic setup for the tutorial...
 ```{r echo=TRUE, results='hide', message=FALSE}
@@ -32,30 +33,26 @@ source(paste0(system.file(package = "ideaBatch"),"/sources.R"))
 This time we want to add changeable settings to an algorithm.
 ```{r echo=TRUE, results='hide', message=FALSE}
 ## Create an Experiment Registry with a Dir-Name and a Sub-Directory for each test.
-reg <- ideaMakeRegistry("Tutorials","Tutorial_1") 
+reg <- ideaMakeRegistry("Tutorials","Tutorial_2") 
 
-## Add Algorithms
-addAlgorithm("optimLHD", algorithm_SpotOptimByName("optimLHD", c(-5,-5),c(5,5),
-                                                    control = list(funEvals = 100)))
-addAlgorithm("cmaesCMAES",algorithm_CMAES(c(-5,-5),c(5,5), control = list("maxit" = 100)))
+## Lets say we want to use optim LHD with different bounds for a comparison:
+## 
+
+ades <- list("optimLHD" = data.table(lower = c(-8:-2),
+                                     upper = c(8:2)))
+
+## Generate a new name for each algorithm:
+addAlgorithm("optimLHD",
+                 algorithm_SpotOptimByName("optimLHD", control = list(funEvals = 100)))    
 
 
-algorithmConfigs <- list(
-    "optimLHD" <- data.frame()
-)
 
 
 ## Add Objective Functions
 addProblem("Rastr2D", of_smoofByName("Rastrigin",2))
 
-
-### Add Settings???
-### 
-### 
-### 
-
 ## Build Experiments
-addExperiments(repls = 10)
+addExperiments(algo.designs = ades,repls = 3)
 ```
 
 You can see all configured experiments and their replications with the summarizeExperiments command:

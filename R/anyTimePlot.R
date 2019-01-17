@@ -33,6 +33,72 @@ generateResultDF <- function(resultList){
     resultDF
 }
 
+#' Compile the 'batchtools' result list into a data.frame
+#'
+#' Currently uses FR format for FR's plots, ask me ;-)
+#'
+#' @param resultList the list you get by ideaLoadResultList
+#'
+#' @return resultDF
+#' @export
+fastResDF <- function(resultList){
+    #require(data.table)
+    resultDF <- NULL
+    for(e in resultList){
+        algoName <- e$job$algo.name
+        problemName <- e$job$prob.name
+        replication <- e$job$repl
+        seed <- e$job$seed
+
+        iterResults <- e$clusterAnalysis$iterResults
+        iterBests <- unlist(lapply(1:length(iterResults),function(x)min(iterResults[1:x],na.rm = T)))
+
+        nEntries <- length(iterBests)
+        subDF <- data.frame(rep(algoName,nEntries),
+                            rep(problemName, nEntries),
+                            rep(replication, nEntries),
+                            rep(seed, nEntries),
+                            1:nEntries,
+                            iterBests)
+
+        resultDF <- rbind(resultDF, subDF)
+    }
+    names(resultDF) <- c("algoName", "problemName", "replication", "seed", "iteration","iterBest")
+    resultDF
+}
+
+#' Compile the 'batchtools' result list into a data.frame
+#'
+#' Currently uses FR format for FR's plots, ask me ;-)
+#'
+#' @param resultList the list you get by ideaLoadResultList
+#'
+#' @return resultDF
+#' @import data.table
+#' @export
+fast20ResDF <- function(resultList){
+    getData <- function(e){
+        algoName <- e$job$algo.name
+        problemName <- e$job$prob.name
+        replication <- e$job$repl
+        seed <- e$job$seed
+
+        iterResults <- e$clusterAnalysis$iterResults
+        iterBests <- unlist(lapply(1:length(iterResults),function(x)min(iterResults[1:x],na.rm = T)))
+
+        nEntries <- length(iterBests)
+        return(data.frame(rep(algoName,nEntries),
+                            rep(problemName, nEntries),
+                            rep(replication, nEntries),
+                            rep(seed, nEntries),
+                            1:nEntries,
+                            iterBests))
+    }
+    df <- data.frame(data.table::rbindlist(lapply(resultList,getData)))
+    names(df) <- c("algoName", "problemName", "replication", "seed", "iteration","iterBest")
+    return(df)
+}
+
 #' Create an anytimePerformancePlot
 #'
 #' @param data The data you wish to plot. (Should usually be only data of 1 objective function)
